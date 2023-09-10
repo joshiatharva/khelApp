@@ -1,0 +1,15 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "**/*"
+  ],
+  "extends": ["airbnb-typescript"],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ]
+  }
+}

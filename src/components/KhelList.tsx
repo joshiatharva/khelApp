@@ -10,6 +10,7 @@ const base = (theme: ThemeInterface) => ({
   container: {
     borderRadius: 20,
     backgroundColor: theme.colors.background,
+    margin: theme.spacing.xs,
   },
   content_container: {
     alignItems: 'flex-start' as const,
@@ -102,7 +103,8 @@ export const KhelList = (
   }, [infoFn]);
 
   return (
-    <View style={containerStyles} key={id}>
+  <Pressable onPress={infoCallback}>
+        <View style={containerStyles} key={id}>
       <View style={contentContainerStyles}>
         <Type color='title' weight="bold" size="md">{name}</Type>
         <View style={categoryContainerStyles}>
@@ -143,5 +145,6 @@ export const KhelList = (
         </Pressable>
       </View>
     </View>
+  </Pressable>
   )
 }

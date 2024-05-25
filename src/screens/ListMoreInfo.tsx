@@ -1,16 +1,18 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { FlatList, Platform, ScrollView, View } from "react-native";
 import { ListStackParamList } from "src/navigation/ListStackNavigator"
-import { KhelItemProps, KhelProps, _delete, useResponsiveStyles } from "../utils";
+import { KhelItemProps, KhelListProps, KhelProps, _delete, useResponsiveStyles } from "../utils";
 import { Button } from "@rneui/base";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Khel, Type } from "../components";
-import { useContext } from "react";
+import { Khel, KhelList, Type } from "../components";
+import { useCallback, useContext } from "react";
 import { ThemeContext, ThemeInterface } from "../theme";
 // import { useDispatch, useSelector } from "react-redux";
 // import { RootState } from "../store";
 // import { del, delAll, upd } from "../features/listSlice";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import DraggableFlatList, { RenderItemParams, ShadowDecorator, ScaleDecorator, OpacityDecorator } from "react-native-draggable-flatlist";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 type ListMoreInfoScreenProps = NativeStackScreenProps<ListStackParamList, 'ListMoreInfo'>
 
@@ -72,7 +74,7 @@ export const ListMoreInfo = ({
 
   const styles = useResponsiveStyles({ base });
 
-  const list = JSON.parse(route.params.item);
+  const list: KhelListProps = JSON.parse(route.params.item);
 
   const removeOnPress = (index: number) => {
     const newKhel = list.khel.filter((e : KhelProps, i : number) => i !== index);
@@ -87,17 +89,29 @@ export const ListMoreInfo = ({
     });
   }
 
-  const renderListItem = ({ name, category, aim, meaning, description } : KhelItemProps, index: number) => (
+  // const PlaceholderList = () => (
+  //  <View />
+  // )
+
+
+
+  const renderListItem = useCallback(
+  ({ 
+    item: { name, aim, category, meaning, description }, 
+    drag,
+    getIndex,
+    isActive, 
+  } : RenderItemParams<KhelProps>) => (
     <Khel
       name={name}
       category={category}
       aim={aim}
       meaning={meaning}
       description={description}
-      removeOnPress={() => removeOnPress(index)}
+      removeOnPress={() => removeOnPress(getIndex()!)}
       moreInfoOnPress={moreInfo}
     />
-  );
+  ), []);
 
   const moreInfo = (k: KhelProps) => {
     navigation.navigate('MoreInfo', { item: JSON.stringify(k), name: k.name });
@@ -165,11 +179,20 @@ export const ListMoreInfo = ({
   );
 
   return (
-    <ScrollView contentContainerStyle={containerStyles} contentInsetAdjustmentBehavior="automatic">
-      <View style={khelContainerStyles}>
-        {list.khel.map((e: KhelProps, i: number) => renderListItem(e, i))}
-      </View>
-    </ScrollView>
+    // <ScrollView contentContainerStyle={containerStyles} contentInsetAdjustmentBehavior="automatic">
+    //   <View style={khelContainerStyles}>
+    //     {list.khel.map((e: KhelProps, i: number) => renderListItem(e, i))}
+    //   </View>
+    // </ScrollView>
+    <GestureHandlerRootView>
+      <DraggableFlatList 
+      data={list.khel} 
+      renderItem={renderListItem} 
+      keyExtractor={(item) => item.name}
+      ListFooterComponent={ListFooterComponent} 
+      ListHeaderComponent={ListHeaderComponent}
+    />
+    </GestureHandlerRootView>
   )
 }
 

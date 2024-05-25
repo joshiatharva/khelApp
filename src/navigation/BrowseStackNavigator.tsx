@@ -32,11 +32,6 @@ export const BrowseStackNavigator = () => {
             headerLargeTitle: true, 
             headerTransparent: true, 
             headerBlurEffect: 'regular',
-            headerRight: () => (
-              <Pressable>
-                <Ionicons name='filter-circle-outline' color={theme.colors.blue}/>
-              </Pressable>
-            )
           }}
         />
       </BrowseStack.Group>

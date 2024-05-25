@@ -10,6 +10,7 @@ const base = (theme: ThemeInterface) => ({
   container: {
     borderRadius: 20,
     backgroundColor: theme.colors.background,
+    margin: theme.spacing.xs,
   },
   content_container: {
     alignItems: 'flex-start' as const,
@@ -60,7 +61,8 @@ export const Khel = (
     description,
     addToListOnPress,
     moreInfoOnPress,
-    removeOnPress, 
+    removeOnPress,
+    ...props 
   }: KhelItemProps
 ) => {
 
@@ -97,7 +99,8 @@ export const Khel = (
   }
 
   return (
-    <View style={containerStyles}>
+    <Pressable onPress={moreInfoOnPressHandler}>
+      <View style={containerStyles}>
       <View style={contentContainerStyles}>
         <Type weight='bold' color='title'>{name}</Type>
         <CategoryBadge category={category} />
@@ -151,6 +154,7 @@ export const Khel = (
         </Pressable>
       </View>
     </View>
+    </Pressable>
   );
 };
 

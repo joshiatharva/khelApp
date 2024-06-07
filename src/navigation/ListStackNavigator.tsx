@@ -1,27 +1,75 @@
 
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
-import { KhelProps } from "../components/KhelItem";
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import GenerateList from '../screens/GenerateList';
 import MoreInfo from '../screens/MoreInfo';
 import Lists from '../screens/Lists';
+import ListMoreInfo from '../screens/ListMoreInfo';
+
+
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { Pressable } from "react-native";
+import { useContext } from "react";
+import { ThemeContext } from "../theme";
+import { KhelProps, KhelListProps } from "../utils";
 
 
 export type ListStackParamList = {
   Lists: undefined;
   GenerateList: undefined;
-  MoreInfo: { item: KhelProps };
+  ListMoreInfo: { item: string, name: string };
+  MoreInfo: { item: string, name: string };
 };
 
-export const ListStack = createStackNavigator<ListStackParamList>();
+const theme = useContext(ThemeContext)
+
+export const ListStack = createNativeStackNavigator<ListStackParamList>();
 
 export const ListStackNavigator = () => (
   <ListStack.Navigator>
-    <ListStack.Screen name="Lists" component={Lists} />
-    <ListStack.Screen name="GenerateList" component={GenerateList} />
-    <ListStack.Screen name="MoreInfo" component={MoreInfo} />
+    <ListStack.Group>
+      <ListStack.Screen 
+        name="Lists" 
+        component={Lists} 
+        options={{ title: 'My lists' }}
+      />
+     </ListStack.Group>
+    <ListStack.Group screenOptions={{ presentation: 'modal' }}>
+      <ListStack.Screen 
+        name="GenerateList" 
+        component={GenerateList} 
+        options={{ title: 'Generate lists', headerLargeTitle: true }}
+      />
+
+      <ListStack.Screen 
+        name="MoreInfo" 
+        component={MoreInfo} 
+        options={({ route, navigation }) => ({
+          title: route.params.name,
+          headerLargeTitle: true,
+          headerRight: () => (
+            <Pressable onPress={() => navigation.goBack()}>
+              <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md} />
+            </Pressable>
+          )
+        })}
+      />
+    <ListStack.Screen 
+        name="ListMoreInfo" 
+        component={ListMoreInfo} 
+        options={({ route, navigation }) => ({
+          title: 'Generate lists', 
+          headerLargeTitle: true, 
+          headerRight: () => (
+            <Pressable onPress={() => navigation.goBack()}>
+              <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md}/>
+            </Pressable>
+          )
+        })}
+        />
+      </ListStack.Group>
   </ListStack.Navigator>
 );
 

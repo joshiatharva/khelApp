@@ -1,3 +1,15 @@
+//prettier-ignore
 {
-  "extends": "@tsconfig/react-native/tsconfig.json"
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "moduleResolution": "nodenext",
+    "skipLibCheck": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext",
+    ],
+    "baseUrl": "."
+  }
 }

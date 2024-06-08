@@ -5,8 +5,9 @@ import { KhelItemProps, KhelListProps, KhelProps, _delete, useResponsiveStyles }
 import { Button } from "@rneui/base";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Khel, KhelList, Type } from "../components";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { ThemeContext, ThemeInterface } from "../theme";
+import { useHeaderHeight } from '@react-navigation/elements';
 // import { useDispatch, useSelector } from "react-redux";
 // import { RootState } from "../store";
 // import { del, delAll, upd } from "../features/listSlice";
@@ -40,7 +41,8 @@ const base = (theme: ThemeInterface) => ({
     // padding: theme.spacing.md,
     gap: theme.spacing.md, 
   },
-  content_container: {
+  header_container: {
+    padding: theme.spacing.xs,
     marginBottom: theme.spacing.md,
   },
   button_ios: {
@@ -72,9 +74,11 @@ export const ListMoreInfo = ({
 
   const theme = useContext(ThemeContext);
 
-  const styles = useResponsiveStyles({ base });
+  const list = JSON.parse(route.params.item);
 
-  const list: KhelListProps = JSON.parse(route.params.item);
+  const [khel, setKhel] = useState<Array<KhelProps>>(list.khel);
+
+  const styles = useResponsiveStyles({ base });
 
   const removeOnPress = (index: number) => {
     const newKhel = list.khel.filter((e : KhelProps, i : number) => i !== index);
@@ -102,7 +106,9 @@ export const ListMoreInfo = ({
     getIndex,
     isActive, 
   } : RenderItemParams<KhelProps>) => (
-    <Khel
+    <ShadowDecorator>
+      <ScaleDecorator activeScale={1.025}>
+      <Khel
       name={name}
       category={category}
       aim={aim}
@@ -110,11 +116,18 @@ export const ListMoreInfo = ({
       description={description}
       removeOnPress={() => removeOnPress(getIndex()!)}
       moreInfoOnPress={moreInfo}
+      onLongPress={drag}
     />
+    </ScaleDecorator>
+    </ShadowDecorator>
   ), []);
 
   const moreInfo = (k: KhelProps) => {
     navigation.navigate('MoreInfo', { item: JSON.stringify(k), name: k.name });
+  }
+
+  const editKhelOrder = ({ data } : { data: Array<KhelProps> })  => {
+    setKhel(data);
   }
 
   const buttonStyles = [
@@ -124,19 +137,19 @@ export const ListMoreInfo = ({
 
   const containerStyles = [styles.container];
   const khelContainerStyles = [styles.khel_container];
-  const contentContainerStyles = [styles.content_container];
+  const headerContainerStyles = [styles.header_container];
   const buttonContainerStyles = [styles.button_container];
   const buttonWarningStyles = [styles.button_warning, Platform.OS === 'ios' && styles.button_ios];
   const buttonErrorStyles = [styles.button_error, Platform.OS === 'ios' && styles.button_ios];
   const buttonGroupStyles = [styles.button_group];
 
   const ListHeaderComponent = () => (
-    <View style={contentContainerStyles}>
+    <View style={headerContainerStyles}>
         <Type weight='medium' size='sm'>Rename this list using the edit button above.</Type>
         <Type weight='medium' size='sm'>Hold, drag & drop to change the order of this list.</Type>
         <Type weight='medium' size='sm'>Add specific khel to this list from the "Browse All" section.</Type>
         <Type weight='medium' size='sm'>Or surprise yourself an add randomly selected khels using "Generate more" button below.</Type>
-      </View>
+    </View>
   );
 
   const ListFooterComponent = () => (
@@ -186,7 +199,9 @@ export const ListMoreInfo = ({
     // </ScrollView>
     <GestureHandlerRootView>
       <DraggableFlatList 
-      data={list.khel} 
+      contentInsetAdjustmentBehavior="automatic"
+      data={khel}
+      onDragEnd={editKhelOrder}
       renderItem={renderListItem} 
       keyExtractor={(item) => item.name}
       ListFooterComponent={ListFooterComponent} 

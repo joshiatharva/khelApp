@@ -60,8 +60,9 @@ export const ListStackNavigator = () => (
         name="ListMoreInfo" 
         component={ListMoreInfo} 
         options={({ route, navigation }) => ({
-          title: 'Generate lists', 
-          headerLargeTitle: true, 
+          title: route.params.name,
+          headerLargeTitle: true,
+          headerTransparent: true, 
           headerRight: () => (
             <Pressable onPress={() => navigation.goBack()}>
               <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md}/>

@@ -50,6 +50,9 @@ const base = (theme: ThemeInterface) => ({
     alignItems: 'center' as const,
     gap: theme.spacing.xxs,
   },
+  pressable_container: {
+    padding: theme.spacing.xxs,
+  }
 });
 
 export const Khel = (
@@ -79,6 +82,7 @@ export const Khel = (
   const footerButtonLeftStyles = [styles.footer_button_left];
   const footerButtonRightStyles = [styles.footer_button_right];
   const buttonContainerStyles = [styles.button_container];
+  const pressableContainerStyles = [styles.pressable_container];
 
   const addToListOnPressHandler = () => {
     if (addToListOnPress) {
@@ -99,7 +103,7 @@ export const Khel = (
   }
 
   return (
-    <Pressable onPress={moreInfoOnPressHandler}>
+    <Pressable onPress={moreInfoOnPressHandler} {...props}>
       <View style={containerStyles}>
       <View style={contentContainerStyles}>
         <Type weight='bold' color='title'>{name}</Type>

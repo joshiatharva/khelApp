@@ -31,7 +31,6 @@ export type BrowseScreenProps = CompositeScreenProps<
 const base = (theme: ThemeInterface) => ({
   container: {
     padding: theme.spacing.xs,
-    gap: theme.spacing.md,
   },
   list_container: {
     paddingTop: theme.spacing.sm,
@@ -99,7 +98,7 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
         <Pressable
           onPress={() => setIsMenuRendered(!isMenuRendered)}
         >
-          <Ionicons name={isMenuRendered ? 'filter-circle' : 'filter-circle-outline' } size={theme.icon.md} color={theme.colors.blue}/>
+          <Ionicons name={isMenuRendered ? 'filter-circle' : 'filter-circle-outline' } size={theme.icon.lg} color={theme.colors.blue}/>
         </Pressable>
       )
     })

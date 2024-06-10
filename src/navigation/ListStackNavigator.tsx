@@ -29,14 +29,14 @@ export const ListStack = createNativeStackNavigator<ListStackParamList>();
 
 export const ListStackNavigator = () => (
   <ListStack.Navigator>
-    {/* <ListStack.Group> */}
+    <ListStack.Group>
       <ListStack.Screen 
         name="Lists" 
         component={Lists} 
         options={{ title: 'My lists' }}
       />
-    {/* </ListStack.Group> */}
-    {/* <ListStack.Group screenOptions={{ presentation: 'modal' }}> */}
+     </ListStack.Group>
+    <ListStack.Group screenOptions={{ presentation: 'modal' }}>
       <ListStack.Screen 
         name="GenerateList" 
         component={GenerateList} 
@@ -51,25 +51,26 @@ export const ListStackNavigator = () => (
           headerLargeTitle: true,
           headerRight: () => (
             <Pressable onPress={() => navigation.goBack()}>
-              <Ionicons name="close-circle-outline" color={theme.colors.blue} />
+              <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md} />
             </Pressable>
           )
         })}
       />
-    {/* </ListStack.Group> */}
     <ListStack.Screen 
         name="ListMoreInfo" 
         component={ListMoreInfo} 
         options={({ route, navigation }) => ({
-          title: 'Generate lists', 
-          headerLargeTitle: true, 
+          title: route.params.name,
+          headerLargeTitle: true,
+          headerTransparent: true, 
           headerRight: () => (
             <Pressable onPress={() => navigation.goBack()}>
-              <Ionicons name="close-circle-outline" color={theme.colors.blue} />
+              <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md}/>
             </Pressable>
           )
         })}
-      />
+        />
+      </ListStack.Group>
   </ListStack.Navigator>
 );
 

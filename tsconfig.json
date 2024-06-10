@@ -1,35 +1,15 @@
+//prettier-ignore
 {
   "extends": "@tsconfig/react-native/tsconfig.json",
-  "compileOnSave": false,
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true,
     "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "importHelpers": true,
-    "target": "ES2015",
-    "module": "ESNext",
-    "lib": [
-      "ES2017",
-      "DOM",
-    ],
+    "moduleResolution": "nodenext",
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-  },
-  "exclude": [
-    "node_modules",
-    "tmp",
-  ]
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext",
+    ],
+    "baseUrl": "."
+  }
 }

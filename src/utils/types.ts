@@ -1,3 +1,5 @@
+import { PressableProps } from "react-native";
+
 export type KhelListProps = {
     name: string;
 
@@ -21,13 +23,13 @@ export type KhelProps = {
   category: string;
 };
 
-export interface KhelItemProps extends KhelProps {
+export interface KhelItemProps extends KhelProps, Omit<PressableProps, 'style'>{
   addToListOnPress?: (val1: any, val2: any) => void;
   moreInfoOnPress?: (val: any) => void;
   removeOnPress?: () => void; 
 };
 
-export interface KhelListItemProps extends KhelListProps {
+export interface KhelListItemProps extends KhelListProps, Omit<PressableProps, 'style'|'id'> {
   infoFn: () => void;
   shareFn: () => void;
 };

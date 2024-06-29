@@ -1,11 +1,11 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { FlatList, Platform, ScrollView, View } from "react-native";
+import { FlatList, Platform, Pressable, ScrollView, View } from "react-native";
 import { ListStackParamList } from "src/navigation/ListStackNavigator"
-import { KhelItemProps, KhelListProps, KhelProps, _delete, useResponsiveStyles } from "../utils";
-import { Button } from "@rneui/base";
+import { KhelItemProps, KhelListProps, KhelProps, _delete, _put, useResponsiveStyles } from "../utils";
+import { Button, Input } from "@rneui/base";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Khel, KhelList, Type } from "../components";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ThemeContext, ThemeInterface } from "../theme";
 import { useHeaderHeight } from '@react-navigation/elements';
 // import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,8 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import DraggableFlatList, { RenderItemParams, ShadowDecorator, ScaleDecorator, OpacityDecorator } from "react-native-draggable-flatlist";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { InputDialog } from "../components/input-dialog";
+import { debounce } from "lodash";
 
 type ListMoreInfoScreenProps = NativeStackScreenProps<ListStackParamList, 'ListMoreInfo'>
 
@@ -28,11 +30,11 @@ const base = (theme: ThemeInterface) => ({
     paddingVertical: theme.spacing.sm,
     borderRadius: 10, 
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+
   },
   container: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
   },
   khel_container: {
     // borderRadius: 20,
@@ -77,6 +79,28 @@ export const ListMoreInfo = ({
   const list = JSON.parse(route.params.item);
 
   const [khel, setKhel] = useState<Array<KhelProps>>(list.khel);
+  const [listName, setListName] = useState<string>(list.name);
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Pressable
+          onPress={() => setDialogVisible(true)}
+        >
+          <Ionicons name={'create-outline'} size={theme.icon.lg} color={theme.colors.blue} />
+        </Pressable>
+      ),
+      headerRight: () => (
+        <Pressable onPress={goBack}>
+          <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.lg}/>
+        </Pressable>
+      ),
+      title: listName,
+    });
+    console.log(listName);
+  }, [listName]);
+  
 
   const styles = useResponsiveStyles({ base });
 
@@ -86,6 +110,19 @@ export const ListMoreInfo = ({
     // dispatch(upd(newList));
   }
 
+  const updateListItem = () => {
+    const newList = {
+      ...list,
+      name: listName,
+    };
+    _put(newList)
+  }
+
+  const goBack = useCallback(() => {
+    updateListItem();
+    navigation.goBack();
+  }, [])
+
   const deleteList = () => {
     // dispatch(delAll());
     _delete(list).then(() => {
@@ -93,10 +130,22 @@ export const ListMoreInfo = ({
     });
   }
 
-  // const PlaceholderList = () => (
-  //  <View />
-  // )
+  const onCancelEvent = useCallback(() => {
+    setDialogVisible(false);
+  }, []);
 
+  const onFireEvent = (value: string) => {
+    setListName(value);
+    setDialogVisible(false);
+  };
+
+  const ChangeNameDialog = () => <InputDialog
+    placeholder={list.name}
+    title="Rename List"
+    visible={dialogVisible}
+    onCancelEvent={onCancelEvent}
+    onFireEvent={onFireEvent}
+  />;
 
 
   const renderListItem = useCallback(
@@ -197,16 +246,17 @@ export const ListMoreInfo = ({
     //     {list.khel.map((e: KhelProps, i: number) => renderListItem(e, i))}
     //   </View>
     // </ScrollView>
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={containerStyles}>
+      <ChangeNameDialog />
       <DraggableFlatList 
-      contentInsetAdjustmentBehavior="automatic"
-      data={khel}
-      onDragEnd={editKhelOrder}
-      renderItem={renderListItem} 
-      keyExtractor={(item) => item.name}
-      ListFooterComponent={ListFooterComponent} 
-      ListHeaderComponent={ListHeaderComponent}
-    />
+        contentInsetAdjustmentBehavior="automatic"
+        data={khel}
+        onDragEnd={editKhelOrder}
+        renderItem={renderListItem} 
+        keyExtractor={(item) => item.name}
+        ListFooterComponent={ListFooterComponent} 
+        ListHeaderComponent={ListHeaderComponent}
+      />
     </GestureHandlerRootView>
   )
 }

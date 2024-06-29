@@ -1,10 +1,10 @@
 import React, { useCallback, useContext } from 'react';
 import { View, Text, Pressable, Platform } from 'react-native';
-import { CategoryBadge } from './CategoryBadge';
-import { ThemeContext, ThemeInterface } from '../theme';
-import { Type } from './Type';
+import { CategoryBadge } from '..';
+import { ThemeContext, ThemeInterface } from '../../theme';
+import { Type } from '..';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { KhelItemProps, addToList, useResponsiveStyles } from '../utils';
+import { KhelItemProps, addToList, useResponsiveStyles } from '../../utils';
 
 const base = (theme: ThemeInterface) => ({
   container: {

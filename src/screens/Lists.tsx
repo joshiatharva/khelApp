@@ -37,19 +37,18 @@ const base = (theme: ThemeInterface) => ({
     borderRadius: 10, 
     gap: theme.spacing.sm,
   },
-  container: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    gap: theme.spacing.sm,
-  },
-  button_container: {
+  button_content: {
     padding: theme.spacing.xxs,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     gap: theme.spacing.xs,
   },
+  button_container: {
+    padding: theme.spacing.xs,
+  },
   content_container: {
-    gap: theme.spacing.xs,
+    rowGap: theme.spacing.xs,
+    paddingVertical: theme.spacing.xs,
   },
   button_error: {
     backgroundColor: theme.colors.red,
@@ -99,9 +98,9 @@ export const Lists = ({ navigation }: ListScreenProps) => {
 
   const buttonErrorStyles = [styles.button, styles.button_error, Platform.OS === 'ios' && styles.button_ios];
 
-  const buttonContainerStyles = [styles.button_container];
+  const buttonContentStyles = [styles.button_content];
 
-  const containerStyles = [styles.container];
+  const buttonContainerStyles = [styles.button_container];
 
   const contentContainerStyles = [styles.content_container]
 
@@ -122,15 +121,13 @@ export const Lists = ({ navigation }: ListScreenProps) => {
   }, [])
 
   const generateList = () => navigation.push('GenerateList');
-  
-  return (
-    <View style={containerStyles}>
-      <View>
+  const listHeaderComponent = () => (
+    <View style={buttonContainerStyles}>
         <Button
           buttonStyle={buttonStyles}
           onPress={generateList}
         >
-          <View style={buttonContainerStyles}>
+          <View style={buttonContentStyles}>
             <Ionicons 
               name='add-outline'
               size={theme.icon.md}
@@ -147,12 +144,16 @@ export const Lists = ({ navigation }: ListScreenProps) => {
           </View>
         </Button> */}
       </View>
+  );
+  
+  return (
       <FlatList
         contentContainerStyle={contentContainerStyles}
         renderItem={renderItem}
+        keyExtractor={item => item.id}
         data={list}
+        ListHeaderComponent={listHeaderComponent}
       />
-    </View>
   );
 }
 

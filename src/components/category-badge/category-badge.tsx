@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 import { Platform, View } from "react-native";
-import { ThemeInterface } from '../theme';
-import { KhelCategory, useResponsiveStyles } from '../utils';
-import { Type } from './Type';
+import { ThemeInterface } from '../../theme';
+import { KhelCategory, useResponsiveStyles } from '../../utils';
+import { Type } from '../typography';
 
 const base = (theme: ThemeInterface) => ({
   container: {

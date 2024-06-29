@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Divider, Input } from '@rneui/base';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { Platform, Pressable, ScrollView, Switch, View } from 'react-native';
-import { Type } from '../components/Type';
+import { Type } from '../components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ThemeContext, ThemeInterface } from '../theme';

@@ -1,4 +1,5 @@
 import { ThemeInterface } from "./theme.interface";
+import { PlatformColor } from "react-native";
 
 export enum Colors {
   LightRed = 'rgb(255, 59, 48)',

@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { View, Text, Button, Pressable, Platform } from 'react-native';
-import { shareList, useResponsiveStyles, KhelListItemProps } from "../utils";
-import { CategoryBadge } from "./CategoryBadge";
+import { shareList, useResponsiveStyles, KhelListItemProps } from "../../utils";
+import { CategoryBadge } from "../category-badge";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Type } from "./Type";
-import { ThemeContext, ThemeInterface } from "../theme";
+import { Type } from "../typography";
+import { ThemeContext, ThemeInterface } from "../../theme";
 
 const base = (theme: ThemeInterface) => ({
   container: {
@@ -104,7 +104,7 @@ export const KhelList = (
 
   return (
   <Pressable onPress={infoCallback}>
-        <View style={containerStyles} key={id}>
+    <View style={containerStyles} key={id}>
       <View style={contentContainerStyles}>
         <Type color='title' weight="bold" size="md">{name}</Type>
         <View style={categoryContainerStyles}>

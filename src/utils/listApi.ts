@@ -122,18 +122,23 @@ export const _delete = async (list: KhelListProps) => {
   return result;
 };
 
-export const _put = async (khel: KhelProps, list?: KhelListProps) => {
+export const _put = async (khel?: KhelProps, list?: KhelListProps) => {
   // const dispatch = useDispatch();
   const data = (await SELECT()).result;
-  let newList;
+  let newList: KhelListProps;
   if (list) {
     newList = list;
-    newList.khel.push(khel);
-  } else {
+    if (khel) {
+      newList.khel.push(khel)
+    }
+
+  } else if (khel) {
     const ind = await getListIndexes();
     newList = createList(ind, khel);
   }
-
+  const newData = data.map((item: KhelListProps) => item.id === newList.id ? newList : item);
+  const result = await INSERT(newData);
+  return result;
 }
 
 export const _deleteAll = async () => {

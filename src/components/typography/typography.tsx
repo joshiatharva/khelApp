@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext } from 'react';
 import { TextProps, Text, Platform } from "react-native";
-import { ThemeInterface, ThemeContext } from '../theme';
-import { useResponsiveStyles } from '../utils';
+import { ThemeInterface, ThemeContext } from '../../theme';
+import { useResponsiveStyles } from '../../utils';
 
 export interface TypeProps extends TextProps {
     children?: ReactNode;

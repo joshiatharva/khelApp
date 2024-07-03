@@ -107,7 +107,6 @@ export const GenerateList = ({ navigation, route }: GenerateListScreenProps) => 
 
   const generateList = (): void => {
     const searchCategories = toggles.some(i => i === true) ? categories.filter((_, i: number) => toggles[i] === true) : categories;
-    console.log('searchCat', searchCategories);
     _post(searchCategories, numOfKhel, listName);
     // dispatch(delAll());
     navigation.pop();

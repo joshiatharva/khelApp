@@ -66,7 +66,6 @@ export const Lists = ({ navigation }: ListScreenProps) => {
   const getData = useCallback(async () => {
     if (list.length === 0) {
       const data  = await _get();
-      console.log('data', data);
       if (data.result) {
         setList(data.result)
       } else if (data.error) {
@@ -76,7 +75,6 @@ export const Lists = ({ navigation }: ListScreenProps) => {
   }, []);
 
   useFocusEffect(() => {
-    console.log('focus');
     getData();
   });
 

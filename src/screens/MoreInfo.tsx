@@ -62,10 +62,6 @@ export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
   const theme = useContext(ThemeContext);
   const item = JSON.parse(route.params.item);
 
-  useEffect(() => {
-    console.log('item: ', item);
-  }, []);
-
   const styles = useResponsiveStyles({ base });
 
   const buttonStyles = [

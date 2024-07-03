@@ -22,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { debounce } from "lodash";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate, Easing } from 'react-native-reanimated';
 
 export type BrowseScreenProps = CompositeScreenProps<
   NativeStackScreenProps<BrowseStackParamList>,
@@ -31,6 +32,7 @@ export type BrowseScreenProps = CompositeScreenProps<
 const base = (theme: ThemeInterface) => ({
   container: {
     padding: theme.spacing.xs,
+    flexDirection: 'column' as const,
   },
   list_container: {
     paddingTop: theme.spacing.sm,
@@ -40,8 +42,10 @@ const base = (theme: ThemeInterface) => ({
     flexDirection: 'row' as const,
   },
   header_container: {
-    paddingTop: useHeaderHeight(),
-    paddingBottom: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
   },
   input_container: {
     justifyContent: 'center' as const,
@@ -96,27 +100,27 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
     navigation.setOptions({
       headerRight: () => (
         <Pressable
-          onPress={() => setIsMenuRendered(!isMenuRendered)}
-        >
-          <Ionicons name={isMenuRendered ? 'filter-circle' : 'filter-circle-outline' } size={theme.icon.lg} color={theme.colors.blue}/>
+          onPress={() => {
+            setIsMenuRendered(isMenuRendered => !isMenuRendered);
+          }
+        }>
+        {isMenuRendered ? ( 
+          <Ionicons name='filter-circle' size={theme.icon.lg} color={theme.colors.blue}/>
+        ): (
+          <Ionicons name='filter-circle-outline' size={theme.icon.lg} color={theme.colors.blue}/>
+        )}
+          
         </Pressable>
       )
     })
-  }, []);
+
+  }, [isMenuRendered, categories]);
 
   const headerHeight = useHeaderHeight();
 
-  // const dispatch = useDispatch();
+  const height = useSharedValue(-500);
 
   const styles = useResponsiveStyles({ base });
-
-  const contentContainerStyles = [styles.container];
-  const listContainerStyles = [styles.list_container, { marginTop: headerHeight }]
-  const toggleContainerStyles = [styles.toggle_container];
-  const headerContainerStyles = [styles.header_container];
-  const inputContainerStyles = [styles.input_container];
-  const inputStyles = [styles.input];
-  const noPaddingStyles = [styles.no_padding];
 
   const openListOptions = async (name: string, khel: KhelProps) => {
     const data = await _get();
@@ -146,12 +150,11 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
   };
 
   const moreInfo = (k: KhelProps) => {
-    console.log('khel', k);
     navigation.push('MoreInfo', { item: JSON.stringify(k), name: k.name });
   }
 
-  const toggleCategoryChange = (key: string) => {
-    setCategories((prevState) => ({...prevState, key: !categories[key] }));
+  const toggleCategoryChange = (key: string, value: boolean) => {
+    setCategories(prevState => ({...prevState, [key]: value }));
   }
 
   const renderListItem = useCallback(({ item: { name, category, aim, meaning, description, addToListOnPress, moreInfoOnPress } }: { item: KhelItemProps }) => (
@@ -166,50 +169,70 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
       />
   ), []);
 
-  const listHeaderMenu = () => (
-    <View style={headerContainerStyles}>
-      <Type>Search:</Type>
-      <Input
-        inputContainerStyle={inputContainerStyles}
-        inputStyle={inputStyles}
-        containerStyle={noPaddingStyles}
-        placeholder='List here'
-        renderErrorMessage={false}
-        onChangeText={updateName}
-        value={searchString}
-      />
-      {/* <SearchBar
-        platform='ios'
-        value={searchString}
-        onChangeText={(text) => setSearchString(text)}
-        onClear={() => setSearchString('')}
-        showCancel={searchString.length > 0}
+  useEffect(() => {
+    if (isMenuRendered) {
+      console.log('Fired down')
+      height.value = headerHeight;
+    } else {
+      console.log('Fired up')
+      height.value = -500;
+    }
+  }, [isMenuRendered])
 
-      /> */}
-      <Type>Sort method:</Type>
-      <SegmentedControl
-        values={['A to Z', 'Randomise', 'Categorical']}
-        selectedIndex={segment}
-        onChange={(event) => setSegment(event.nativeEvent.selectedSegmentIndex)}
-      />
-      <Type>Categories:</Type>
-      {Object.keys(categories).map((category) => (
-      <View style={toggleContainerStyles}>
-        <Type>{category}</Type>
-        <Switch 
-          key={category}
-          onValueChange={() => toggleCategoryChange(category)}
-          value={categories[category]}
-        />
-      </View>
-      ))}
-    </View>
-  )
+  const animatedStyles = useAnimatedStyle(() => {
+    console.log(height.value);
+    return {
+      marginTop: withTiming(height.value, { duration: 700 }),
+    // transform: [{ translateY: marginTop.value }],
+    // opacity: interpolate(
+    //   marginTop.value,
+    //   [marginTop.value, headerHeight],
+    //   [0, 1],
+    // ),
+  }}, []);
 
+
+  const contentContainerStyles = [styles.container];
+
+  const toggleContainerStyles = [styles.toggle_container];
+  const headerContainerStyles = [styles.header_container, animatedStyles];
+  const inputContainerStyles = [styles.input_container];
+  const inputStyles = [styles.input];
+  const noPaddingStyles = [styles.no_padding];
 
   const renderKhelList = () => (
     <View>
-      {isMenuRendered && listHeaderMenu()}
+      {isMenuRendered && (
+        <Animated.View style={headerContainerStyles}>
+          <Type>Search:</Type>
+          <Input
+            inputContainerStyle={inputContainerStyles}
+            inputStyle={inputStyles}
+            containerStyle={noPaddingStyles}
+            placeholder='List here'
+            renderErrorMessage={false}
+            onChangeText={updateName}
+            value={searchString}
+          />
+          <Type>Sort method:</Type>
+          <SegmentedControl
+            values={['A to Z', 'Randomise', 'Categorical']}
+            selectedIndex={segment}
+            onChange={(event) => setSegment(event.nativeEvent.selectedSegmentIndex)}
+          />
+          <Type>Categories:</Type>
+          {Object.keys(categories).map((category) => (
+            <View style={toggleContainerStyles}>
+              <Type>{category}</Type>
+              <Switch 
+                key={category}
+                onValueChange={(value: boolean) => toggleCategoryChange(category, value)}
+                value={categories[category]}
+              />
+            </View>
+          ))}
+        </Animated.View>
+      )}
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={khel}

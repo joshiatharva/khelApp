@@ -58,7 +58,6 @@ export const createList = (lN: string | number, k: KhelProps | Array<KhelProps>)
 
 export const pickKhelByCategory = (s: number, arr: Array<string>) => {
   const filteredKhel = khel.filter((k) => arr.includes(k.category));
-  console.log('khels', filteredKhel, sampleSize(filteredKhel, s))
   return sampleSize(filteredKhel, s);
 };
 
@@ -97,15 +96,11 @@ export const _post = async (arr: string[], len: number, name: string) => {
   const khel =  pickKhelByCategory(len, arr);
   let newList;
   if (name.length <= 0) {
-    console.log('name', name);
     const listNames = data.filter((list: KhelListProps) => list.name.startsWith('List'));
     const finalListIndex = listNames.map((i: KhelListProps) => i.name.replace('List ', '')).sort()[listNames.length-1];
     newList = createList((Boolean(finalListIndex) ? (Number(finalListIndex) + 1) : 1), khel);
-    console.log('newList:', newList);
   } else {
-    console.log('name', name);
     newList = createList(name, khel);
-    console.log('newList:', newList);
   }
   // dispatch(add(newList));
   data.push(newList);
@@ -117,7 +112,6 @@ export const _delete = async (list: KhelListProps) => {
   // const dispatch = useDispatch();
   // dispatch(del(list.id));
   const data = (await SELECT()).result;
-  console.log(data.filter(({ id }: { id: string }) => id !== list.id));
   const result = await INSERT(data.filter(({ id }: { id: string }) => id !== list.id));
   return result;
 };

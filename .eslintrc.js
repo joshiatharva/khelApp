@@ -1,6 +1,7 @@
 module.exports = {
     root: true,
-    ignorePatterns: ['**/node_modules/**', '**/coverage/**'],
+    ignorePatterns: ['**/node_modules/**', '**/coverage/**', 'build', 'android', 'ios',
+    ],
     extends: '@react-native-community',
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint'],

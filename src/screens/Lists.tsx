@@ -3,7 +3,7 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ListStackParamList } from "../navigation/ListStackNavigator";
 import { BottomTabParamList } from "../navigation/TabNavigator";
-import { useFocusEffect, type CompositeScreenProps } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused, type CompositeScreenProps } from "@react-navigation/native";
 // import { useDispatch, useSelector } from "react-redux";
 // import { RootState, store } from "../store";
 import { KhelListProps, useResponsiveStyles, _get, _deleteAll } from "../utils";
@@ -62,23 +62,27 @@ export const Lists = ({ navigation }: ListScreenProps) => {
 
   const [list, setList] = useState<KhelListProps[]>([]);
   const [err, setErr] = useState<string>();
+  const isFocused = useIsFocused();
 
-  const getData = useCallback(async () => {
-    if (list.length === 0) {
-      const data  = await _get();
-      console.log('data', data);
-      if (data.result) {
-        setList(data.result)
-      } else if (data.error) {
-        setErr(data.error)
+  useFocusEffect(
+    useCallback(() => {
+      async function getData() {
+        const data = await _get();
+        console.log('data get');
+        if (data.result) {
+          setList(data.result);
+        } else {
+          setList(data.error);
+        }
       }
-    }
-  }, []);
+      getData();
+    }, []),
+  );
 
-  useFocusEffect(() => {
-    console.log('focus');
-    getData();
-  });
+  // useEffect(() => {
+  //   console.log(list.length);
+  // }, [list]);
+
 
   const info = (index: number) => {
     const khelList = list[index];
@@ -112,6 +116,7 @@ export const Lists = ({ navigation }: ListScreenProps) => {
       khel={khel}
       infoFn={() => info(index)}
       shareFn={share}
+      key={id}
     />
   );
 
@@ -120,7 +125,10 @@ export const Lists = ({ navigation }: ListScreenProps) => {
     setList([]);
   }, [])
 
-  const generateList = () => navigation.push('GenerateList');
+  const generateList = () => {
+    console.log(isFocused);
+    navigation.push('GenerateList');
+  }
   const listHeaderComponent = () => (
     <View style={buttonContainerStyles}>
         <Button

@@ -97,7 +97,6 @@ export const Type = ({
   size,
   italic,
   underline,
-  ...props
 }: TypeProps) => {
 
   const styles = useResponsiveStyles({ base });

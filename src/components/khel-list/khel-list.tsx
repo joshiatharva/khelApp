@@ -65,6 +65,7 @@ export const KhelList = (
     khel, 
     infoFn, 
     shareFn,
+    ...props
   }: KhelListItemProps
 ) => {
 
@@ -85,7 +86,7 @@ export const KhelList = (
   const renderKhelList = () => (
     <View>
       {khel.map((e, i) => (
-        <Type size="sm" weight="medium">{i+1}: {e.name} ({e.category})</Type>
+        <Type size="sm" weight="medium" key={i.toString()}>{i+1}: {e.name} ({e.category})</Type>
       ))}
     </View>
   );
@@ -103,13 +104,13 @@ export const KhelList = (
   }, [infoFn]);
 
   return (
-  <Pressable onPress={infoCallback}>
+  <Pressable onPress={infoCallback} {...props}>
     <View style={containerStyles} key={id}>
       <View style={contentContainerStyles}>
         <Type color='title' weight="bold" size="md">{name}</Type>
         <View style={categoryContainerStyles}>
-          {categories.map((category) => (
-            <CategoryBadge category={category}/>
+          {categories.map((category, index) => (
+            <CategoryBadge category={category} key={index.toString()}/>
           ))}
         </View>
         <View>

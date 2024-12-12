@@ -98,7 +98,6 @@ export const ListMoreInfo = ({
       ),
       title: listName,
     });
-    console.log(listName);
   }, [listName]);
   
 

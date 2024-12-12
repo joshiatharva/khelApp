@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, View, Text, Platform, Alert, Pressable, Switch } from "react-native";
 
 import khel from '../../assets/khel.json';
@@ -22,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { debounce } from "lodash";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate, Easing, useDerivedValue } from 'react-native-reanimated';
 
 export type BrowseScreenProps = CompositeScreenProps<
   NativeStackScreenProps<BrowseStackParamList>,
@@ -31,6 +32,7 @@ export type BrowseScreenProps = CompositeScreenProps<
 const base = (theme: ThemeInterface) => ({
   container: {
     padding: theme.spacing.xs,
+    flexDirection: 'column' as const,
   },
   list_container: {
     paddingTop: theme.spacing.sm,
@@ -40,13 +42,20 @@ const base = (theme: ThemeInterface) => ({
     flexDirection: 'row' as const,
   },
   header_container: {
-    paddingTop: useHeaderHeight(),
-    paddingBottom: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    gap: theme.spacing.sm,
+    // width: '100%' as const,
+    // overflow: 'hidden' as const,
+  },
+  animated_container: {
+    overflow: 'hidden' as const,
+    width: '100%' as const,
   },
   input_container: {
     justifyContent: 'center' as const,
     alignSelf: 'center' as const,
-    backgroundColor: theme.colors.altBackground,
+    backgroundColor: theme.colors.background,
     borderRadius: theme.spacing.xs,
     maxHeight: theme.spacing.xl,
     borderBottomWidth: 0,
@@ -96,27 +105,26 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
     navigation.setOptions({
       headerRight: () => (
         <Pressable
-          onPress={() => setIsMenuRendered(!isMenuRendered)}
-        >
-          <Ionicons name={isMenuRendered ? 'filter-circle' : 'filter-circle-outline' } size={theme.icon.lg} color={theme.colors.blue}/>
+          onPress={() => {
+            setIsMenuRendered(isMenuRendered => !isMenuRendered);
+          }
+        }>
+        {isMenuRendered ? ( 
+          <Ionicons name='filter-circle' size={theme.icon.lg} color={theme.colors.blue}/>
+        ): (
+          <Ionicons name='filter-circle-outline' size={theme.icon.lg} color={theme.colors.blue}/>
+        )}
+          
         </Pressable>
       )
     })
-  }, []);
+
+  }, [isMenuRendered, categories]);
 
   const headerHeight = useHeaderHeight();
-
-  // const dispatch = useDispatch();
+  const menuHeight = useRef<number>(0);
 
   const styles = useResponsiveStyles({ base });
-
-  const contentContainerStyles = [styles.container];
-  const listContainerStyles = [styles.list_container, { marginTop: headerHeight }]
-  const toggleContainerStyles = [styles.toggle_container];
-  const headerContainerStyles = [styles.header_container];
-  const inputContainerStyles = [styles.input_container];
-  const inputStyles = [styles.input];
-  const noPaddingStyles = [styles.no_padding];
 
   const openListOptions = async (name: string, khel: KhelProps) => {
     const data = await _get();
@@ -146,12 +154,11 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
   };
 
   const moreInfo = (k: KhelProps) => {
-    console.log('khel', k);
     navigation.push('MoreInfo', { item: JSON.stringify(k), name: k.name });
   }
 
-  const toggleCategoryChange = (key: string) => {
-    setCategories((prevState) => ({...prevState, key: !categories[key] }));
+  const toggleCategoryChange = (key: string, value: boolean) => {
+    setCategories(prevState => ({...prevState, [key]: value }));
   }
 
   const renderListItem = useCallback(({ item: { name, category, aim, meaning, description, addToListOnPress, moreInfoOnPress } }: { item: KhelItemProps }) => (
@@ -166,58 +173,83 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
       />
   ), []);
 
-  const listHeaderMenu = () => (
-    <View style={headerContainerStyles}>
-      <Type>Search:</Type>
-      <Input
-        inputContainerStyle={inputContainerStyles}
-        inputStyle={inputStyles}
-        containerStyle={noPaddingStyles}
-        placeholder='List here'
-        renderErrorMessage={false}
-        onChangeText={updateName}
-        value={searchString}
-      />
-      {/* <SearchBar
-        platform='ios'
-        value={searchString}
-        onChangeText={(text) => setSearchString(text)}
-        onClear={() => setSearchString('')}
-        showCancel={searchString.length > 0}
 
-      /> */}
-      <Type>Sort method:</Type>
-      <SegmentedControl
-        values={['A to Z', 'Randomise', 'Categorical']}
-        selectedIndex={segment}
-        onChange={(event) => setSegment(event.nativeEvent.selectedSegmentIndex)}
-      />
-      <Type>Categories:</Type>
-      {Object.keys(categories).map((category) => (
-      <View style={toggleContainerStyles}>
-        <Type>{category}</Type>
-        <Switch 
-          key={category}
-          onValueChange={() => toggleCategoryChange(category)}
-          value={categories[category]}
-        />
-      </View>
-      ))}
-    </View>
-  )
+  const contentContainerStyles = [styles.container];
 
+  const toggleContainerStyles = [styles.toggle_container];
+  const inputContainerStyles = [styles.input_container];
+  const inputStyles = [styles.input];
+  const noPaddingStyles = [styles.no_padding];
+
+  const HeaderMenu = ({
+
+
+  }) => {
+    const height = useSharedValue(0);
+    const derivedHeight = useDerivedValue(() => 
+      withTiming(
+        height.value * Number(isMenuRendered), 
+        {
+          duration: 300,
+        }
+      ),
+    );
+  
+    const animatedStyles = useAnimatedStyle(() => ({
+      height: derivedHeight.value,
+    }));
+    const animatedContainerStyles = [styles.animated_container, animatedStyles];
+    const headerContainerStyles = [styles.header_container];
+    return (
+      <Animated.View 
+          style={animatedContainerStyles}
+        >
+        <View 
+          style={headerContainerStyles}
+          onLayout={(e) => { height.value = e.nativeEvent.layout.height }} 
+        >
+          <Type weight="bold" size="sm">Search:</Type>
+          <Input
+            inputContainerStyle={inputContainerStyles}
+            inputStyle={inputStyles}
+            containerStyle={noPaddingStyles}
+            placeholder='List here'
+            renderErrorMessage={false}
+            onChangeText={updateName}
+            value={searchString}
+          />
+          <Type weight="bold" size="sm">Sort method:</Type>
+          <SegmentedControl
+            values={['A to Z', 'Randomise', 'Categorical']}
+            selectedIndex={segment}
+            onChange={(event) => setSegment(event.nativeEvent.selectedSegmentIndex)}
+          />
+          <Type weight="bold" size="sm">Categories:</Type>
+          {Object.keys(categories).map((category) => (
+            <View style={toggleContainerStyles} key={category}>
+              <Type weight="medium" color="title">{category}</Type>
+              <Switch
+                onValueChange={(value: boolean) => toggleCategoryChange(category, value)}
+                value={categories[category]}
+              />
+            </View>
+          ))}
+          </View>
+
+        </Animated.View>
+    );
+
+  }
 
   const renderKhelList = () => (
-    <View>
-      {isMenuRendered && listHeaderMenu()}
       <FlatList
+        ListHeaderComponent={<HeaderMenu />}
         contentInsetAdjustmentBehavior="automatic"
         data={khel}
         contentContainerStyle={contentContainerStyles}
         renderItem={renderListItem}
         keyExtractor={(_, index) => index.toString()}
       />
-    </View>
     );
 
   return renderKhelList();

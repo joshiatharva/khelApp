@@ -17,14 +17,9 @@ export const InputDialog = (
   }
 ) => {
     const [inputStr, setInputStr] = useState<string>('');
-
-    useEffect(() => {
-      console.log('inputStr: ', inputStr);
-    }, []);
     
     const onFireEventResponseHandler = useCallback(() => {
       onFireEvent(inputStr);
-      console.log(inputStr);
     }, [inputStr]);
 
     return (

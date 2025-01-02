@@ -183,14 +183,13 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
 
   const HeaderMenu = ({
 
-
   }) => {
     const height = useSharedValue(0);
     const derivedHeight = useDerivedValue(() => 
       withTiming(
         height.value * Number(isMenuRendered), 
         {
-          duration: 300,
+          duration: 500,
         }
       ),
     );

@@ -107,9 +107,9 @@ export const GenerateList = ({ navigation, route }: GenerateListScreenProps) => 
 
   const generateList = (): void => {
     const searchCategories = toggles.some(i => i === true) ? categories.filter((_, i: number) => toggles[i] === true) : categories;
-    _post(searchCategories, numOfKhel, listName);
-    // dispatch(delAll());
-    navigation.pop();
+    _post(searchCategories, numOfKhel, listName).then(() => {
+      navigation.pop();
+    })
   }
 
   const incrementCount = () => {

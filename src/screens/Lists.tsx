@@ -3,7 +3,7 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ListStackParamList } from "../navigation/ListStackNavigator";
 import { BottomTabParamList } from "../navigation/TabNavigator";
-import { useFocusEffect, type CompositeScreenProps } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused, type CompositeScreenProps } from "@react-navigation/native";
 // import { useDispatch, useSelector } from "react-redux";
 // import { RootState, store } from "../store";
 import { KhelListProps, useResponsiveStyles, _get, _deleteAll } from "../utils";
@@ -49,6 +49,7 @@ const base = (theme: ThemeInterface) => ({
   content_container: {
     rowGap: theme.spacing.xs,
     paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
   },
   button_error: {
     backgroundColor: theme.colors.red,
@@ -61,22 +62,36 @@ export const Lists = ({ navigation }: ListScreenProps) => {
   const styles = useResponsiveStyles({ base });
 
   const [list, setList] = useState<KhelListProps[]>([]);
-  const [err, setErr] = useState<string>();
+  const [err, setErr] = useState<string>('');
+  const isFocused = useIsFocused();
 
   const getData = useCallback(async () => {
-    if (list.length === 0) {
-      const data  = await _get();
-      if (data.result) {
-        setList(data.result)
-      } else if (data.error) {
-        setErr(data.error)
-      }
-    }
+      _get().then((data) => {
+        if (data.result) {
+          setList(data.result)
+          console.log(data.result)
+        } else if (data.error) {
+          setErr(data.error)
+        }
+      });
   }, []);
 
-  useFocusEffect(() => {
-    getData();
-  });
+  useEffect(() => {
+    console.log("List length: ", list.length);
+  }, [list]);
+
+
+  useFocusEffect(
+    useCallback(() => { 
+    if (list.length < 1) {
+      getData();
+    }
+    return () => {
+      setList([]);
+      setErr('');
+    }
+    }, [])
+  );
 
   const info = (index: number) => {
     const khelList = list[index];

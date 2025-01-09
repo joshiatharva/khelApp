@@ -101,7 +101,7 @@ export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
         <Type size="sm" weight="regular">{description}</Type>
       </View>
       <View style={buttonGroupStyles}>
-        <Button buttonStyle={buttonStyles}>
+        <Button buttonStyle={buttonStyles} onPress={() => }>
           <View style={buttonContainerStyles}>
             <Ionicons 
               name='add'

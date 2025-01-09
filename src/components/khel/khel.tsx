@@ -4,25 +4,31 @@ import { CategoryBadge } from '..';
 import { ThemeContext, ThemeInterface } from '../../theme';
 import { Type } from '..';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Share from 'react-native-share';
 import { KhelItemProps, addToList, useResponsiveStyles } from '../../utils';
 
 const base = (theme: ThemeInterface) => ({
   container: {
     borderRadius: 20,
-    backgroundColor: theme.colors.background,
     margin: theme.spacing.xs,
+    flex: 1,
   },
   content_container: {
     alignItems: 'flex-start' as const,
     padding: theme.spacing.md,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     gap: theme.spacing.xs, 
+    backgroundColor: theme.colors.background,
   },
   container_ios: {
     borderCurve: 'continuous' as const,
   },
   footer_button_left: {
     borderRightWidth: 0.5,
+    borderTopWidth: 1,
     borderColor: theme.colors.neutral300,
+    backgroundColor: theme.colors.invertedBackground,
     padding: theme.spacing.xs,
     alignSelf: 'stretch' as const,
     alignItems: 'center' as const,
@@ -30,17 +36,22 @@ const base = (theme: ThemeInterface) => ({
   },
   footer_button_right: {
     borderLeftWidth: 0.5,
-    borderColor: theme.colors.neutral100,
+    borderTopWidth: 1,
+    borderColor: theme.colors.neutral300,
+    backgroundColor: theme.colors.invertedBackground,
     padding: theme.spacing.xs,
     alignSelf: 'stretch' as const,
     alignItems: 'center' as const,
+    overflow: 'hidden' as const,
     flex: 1,
   },
   footer: {
-    borderTopWidth: 1,
-    borderColor: theme.colors.neutral100,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderColor: theme.colors.neutral300,
     flexDirection: 'row' as const,
     justifyContent: 'center' as const,
+    overflow: 'hidden' as const,
   },
   text_container: {
     flexDirection: 'row' as const,
@@ -48,7 +59,7 @@ const base = (theme: ThemeInterface) => ({
   button_container: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: theme.spacing.xxs,
+    gap: theme.spacing.xs,
   },
   pressable_container: {
     padding: theme.spacing.xxs,
@@ -108,10 +119,18 @@ export const Khel = (
       <View style={contentContainerStyles}>
         <Type weight='bold' color='title'>{name}</Type>
         <CategoryBadge category={category} />
-        <Text>
-          <Type weight='bold' color='title' size='sm'>Aim: </Type>
-          <Type size='sm' weight='medium'>{aim}</Type>
-        </Text>
+        {/* <View style={{ 
+          flexDirection: 'row', 
+          paddingRight: theme.spacing.xl, 
+          flexWrap: 'wrap',  
+        }}> */}
+          <Text>
+            <Type size='sm' weight='medium'>
+              <Type weight='bold' color='title' size='sm'>Aim: </Type>
+              {aim}
+            </Type>
+          </Text>
+        {/* </View> */}
       </View>
       <View style={footerStyles}>
       {addToListOnPress && !removeOnPress ? (
@@ -152,6 +171,7 @@ export const Khel = (
               name='information-circle-outline' 
               color={theme.colors.text} 
               size={theme.icon.default}
+              
             />
             <Type weight='medium' size='sm'>More Info</Type>
           </View>

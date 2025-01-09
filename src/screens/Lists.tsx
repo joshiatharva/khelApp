@@ -6,7 +6,7 @@ import { BottomTabParamList } from "../navigation/TabNavigator";
 import { useFocusEffect, useIsFocused, type CompositeScreenProps } from "@react-navigation/native";
 // import { useDispatch, useSelector } from "react-redux";
 // import { RootState, store } from "../store";
-import { KhelListProps, useResponsiveStyles, _get, _deleteAll } from "../utils";
+import { KhelListProps, useResponsiveStyles, _get, _deleteAll, shareListMsg } from "../utils";
 import { KhelList, Type } from "../components";
 import MoreInfo from "./MoreInfo";
 import { Button } from "@rneui/base";
@@ -25,6 +25,7 @@ const base = (theme: ThemeInterface) => ({
     width: '100%' as const,
     backgroundColor: theme.colors.background,
     borderRadius: 10,
+    alignItems: 'center' as const,
   },
   button_ios: {
     borderCurve: 'continuous' as const,
@@ -65,7 +66,7 @@ export const Lists = ({ navigation }: ListScreenProps) => {
   const [err, setErr] = useState<string>('');
   const isFocused = useIsFocused();
 
-  const getData = useCallback(async () => {
+  const getData = useCallback(() => {
       _get().then((data) => {
         if (data.result) {
           setList(data.result)
@@ -98,10 +99,6 @@ export const Lists = ({ navigation }: ListScreenProps) => {
     navigation.push('ListMoreInfo', { item: JSON.stringify(khelList), name: khelList.name ? khelList.name : 'Undefined' });
   }
 
-  const share = () => {
-
-  }
-
   const theme = useContext(ThemeContext);
 
   const buttonStyles = [
@@ -124,7 +121,7 @@ export const Lists = ({ navigation }: ListScreenProps) => {
       categories={categories}
       khel={khel}
       infoFn={() => info(index)}
-      shareFn={share}
+      shareFn={() => shareListMsg({ name, khel })}
     />
   );
 
@@ -143,7 +140,7 @@ export const Lists = ({ navigation }: ListScreenProps) => {
           <View style={buttonContentStyles}>
             <Ionicons 
               name='add-outline'
-              size={theme.icon.md}
+              size={theme.icon.sm}
               color={theme.colors.title}
             />
             <Type color="title" weight="bold" size='md'>
@@ -165,6 +162,7 @@ export const Lists = ({ navigation }: ListScreenProps) => {
         renderItem={renderItem}
         keyExtractor={item => item.id}
         data={list}
+        contentInsetAdjustmentBehavior="automatic"
         ListHeaderComponent={listHeaderComponent}
       />
   );

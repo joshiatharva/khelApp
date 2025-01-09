@@ -3,7 +3,7 @@ import { NativeStackScreenProps, createNativeStackNavigator } from "@react-navig
 
 import GenerateList from '../screens/GenerateList';
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 import { useContext } from "react";
 import { ThemeContext } from "../theme";
 import { KhelProps, KhelListProps } from "../utils";
@@ -30,8 +30,16 @@ export const BrowseStackNavigator = () => {
           options={{ 
             title: 'Browse all', 
             headerLargeTitle: true, 
-            headerTransparent: true, 
-            headerBlurEffect: 'regular',
+            headerTransparent: true,
+            headerLargeStyle: {
+              backgroundColor: theme.colors.altBackground,
+            },
+            headerStyle: {
+              backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.1)' : theme.colors.background
+            },
+            headerBlurEffect: 'prominent',
+            headerShadowVisible: true,
+            headerLargeTitleShadowVisible: false,
           }}
         />
       </BrowseStack.Group>
@@ -42,12 +50,16 @@ export const BrowseStackNavigator = () => {
           options={({ route, navigation }) => ({
             title: route.params.name,
             headerLargeTitle: true,
-            headerRight: () => (
-              <Pressable onPress={() => navigation.goBack()}>
-                <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.lg} />
-              </Pressable>
-            ),
-            headerLeft: () => null,
+            headerTransparent: true,
+            headerLargeStyle: {
+              backgroundColor: theme.colors.altBackground,
+            },
+            headerStyle: {
+              backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.1)' : theme.colors.background
+            },
+            headerBlurEffect: 'prominent',
+            headerShadowVisible: true,
+            headerLargeTitleShadowVisible: false,
           })}
         />
       </BrowseStack.Group>

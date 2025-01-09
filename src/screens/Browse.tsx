@@ -7,7 +7,7 @@ import { CompositeScreenProps, useNavigation } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { BottomTabParamList } from "../navigation/TabNavigator";
 import { ThemeContext, ThemeInterface } from "../theme";
-import { useResponsiveStyles, addToList, createList, KhelItemProps, KhelProps, _get, KhelListProps, KhelCategory, getListIndexes, } from "../utils";
+import { useResponsiveStyles, addToList, createListObj, KhelItemProps, KhelProps, _get, KhelListProps, KhelCategory, getListIndexes, } from "../utils";
 import { useHeaderHeight } from '@react-navigation/elements';
 
 // import { useDispatch, useSelector } from 'react-redux';
@@ -68,7 +68,15 @@ const base = (theme: ThemeInterface) => ({
   no_padding: {
     paddingHorizontal: 0,
   },
-})
+});
+
+const shuffle = (arr: Array<KhelProps>) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 export const Browse = ({ navigation, route }: BrowseScreenProps) => {
   const toggleGroup = Object.fromEntries(
@@ -81,7 +89,7 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [isMenuRendered, setIsMenuRendered] = useState(false);
   const [categories, setCategories] = useState({...toggleGroup});
-  const [segment, setSegment] = useState(0);
+  const [segment, setSegment] = useState<number>(0);
 
   const theme = useContext(ThemeContext);
 
@@ -89,17 +97,42 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
     setSearchString(value);
   }, []), 200);
 
-
-
   const flatlistData = useMemo(() => {
-    let filteredData = khel;
+    // sort initial data alphabetically
+    let filteredData = khel.sort((a, b) => {
+      const textA = a.name.toLowerCase();
+      const textB = b.name.toLowerCase();
+      return textA < textB ? -1 : (textA > textB ? 1 : 0)
+    });
+    if (segment) {
+      switch (segment) {
+        case 0:
+          // sorting a-z
+          filteredData = khel.sort((a, b) => {
+            const textA = a.name.toLowerCase();
+            const textB = b.name.toLowerCase();
+            return textA < textB ? -1 : (textA > textB ? 1 : 0)
+          });
+          break;
+        case 1:
+          // sorting a-z
+          filteredData = shuffle(khel);
+          break;
+        default:
+          // normal list
+          filteredData = khel;
+          break;
+      }
+    }
+    if (Object.values(categories).some(Boolean)) {
+      const trueCategories = Object.keys(categories).filter(key => categories[key]);
+      filteredData = filteredData.filter(e => trueCategories.includes(e.category));
+    }
     if (searchString) {
       filteredData = khel.filter(e => e.name.includes(searchString.toLowerCase()))
     }
-    return filteredData.filter(e => {
-      
-    });
-  }, [])
+    return filteredData;
+  }, [categories, searchString, segment]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -110,9 +143,9 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
           }
         }>
         {isMenuRendered ? ( 
-          <Ionicons name='filter-circle' size={theme.icon.lg} color={theme.colors.blue}/>
+          <Ionicons name='filter-circle' size={theme.icon.md} color={theme.colors.blue}/>
         ): (
-          <Ionicons name='filter-circle-outline' size={theme.icon.lg} color={theme.colors.blue}/>
+          <Ionicons name='filter-circle-outline' size={theme.icon.md} color={theme.colors.blue}/>
         )}
           
         </Pressable>
@@ -139,7 +172,7 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
       [
         { 
           text: 'New List',
-          onPress: () => createList(listIndex, khel),
+          onPress: () => createListObj(listIndex, khel),
         },
         { 
           text: 'Cancel',
@@ -181,9 +214,10 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
   const inputStyles = [styles.input];
   const noPaddingStyles = [styles.no_padding];
 
-  const HeaderMenu = ({
+  const HeaderMenu =
+    ({
 
-  }) => {
+    }) => {
     const height = useSharedValue(0);
     const derivedHeight = useDerivedValue(() => 
       withTiming(
@@ -238,16 +272,18 @@ export const Browse = ({ navigation, route }: BrowseScreenProps) => {
         </Animated.View>
     );
 
-  }
+  };
 
   const renderKhelList = () => (
       <FlatList
         ListHeaderComponent={<HeaderMenu />}
         contentInsetAdjustmentBehavior="automatic"
-        data={khel}
+        data={flatlistData}
         contentContainerStyle={contentContainerStyles}
         renderItem={renderListItem}
         keyExtractor={(_, index) => index.toString()}
+        removeClippedSubviews
+        maxToRenderPerBatch={6}
       />
     );
 

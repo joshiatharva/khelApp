@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { View, Text, Button, Pressable, Platform } from 'react-native';
-import { shareList, useResponsiveStyles, KhelListItemProps } from "../../utils";
+import { useResponsiveStyles, KhelListItemProps } from "../../utils";
 import { CategoryBadge } from "../category-badge";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Type } from "../typography";
@@ -8,20 +8,23 @@ import { ThemeContext, ThemeInterface } from "../../theme";
 
 const base = (theme: ThemeInterface) => ({
   container: {
-    borderRadius: 20,
-    backgroundColor: theme.colors.background,
     margin: theme.spacing.xs,
   },
   content_container: {
     alignItems: 'flex-start' as const,
     padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
     gap: theme.spacing.xs, 
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   container_ios: {
     borderCurve: 'continuous' as const,
   },
   footer_button_left: {
     borderRightWidth: 0.5,
+    borderTopWidth: 1,
+    backgroundColor: theme.colors.invertedBackground,
     borderColor: theme.colors.neutral300,
     padding: theme.spacing.xs,
     alignSelf: 'stretch' as const,
@@ -30,17 +33,21 @@ const base = (theme: ThemeInterface) => ({
   },
   footer_button_right: {
     borderLeftWidth: 0.5,
-    borderColor: theme.colors.neutral100,
+    borderTopWidth: 1,
+    backgroundColor: theme.colors.invertedBackground,
+    borderColor: theme.colors.neutral300,
     padding: theme.spacing.xs,
     alignSelf: 'stretch' as const,
     alignItems: 'center' as const,
     flex: 1,
   },
   footer: {
-    borderTopWidth: 1,
-    borderColor: theme.colors.neutral100,
     flexDirection: 'row' as const,
     justifyContent: 'center' as const,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderColor: theme.colors.neutral300,
+    overflow: 'hidden' as const,
   },
   text_container: {
     flexDirection: 'row' as const,
@@ -85,7 +92,7 @@ export const KhelList = (
   const renderKhelList = () => (
     <View>
       {khel.map((e, i) => (
-        <Type size="sm" weight="medium">{i+1}: {e.name} ({e.category})</Type>
+        <Type size="sm" weight="medium" key={i}>{i+1}: {e.name} ({e.category})</Type>
       ))}
     </View>
   );
@@ -109,7 +116,7 @@ export const KhelList = (
         <Type color='title' weight="bold" size="md">{name}</Type>
         <View style={categoryContainerStyles}>
           {categories.map((category) => (
-            <CategoryBadge category={category}/>
+            <CategoryBadge category={category} key={category} />
           ))}
         </View>
         <View>

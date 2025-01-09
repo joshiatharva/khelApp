@@ -1,15 +1,15 @@
 import { CompositeScreenProps, NavigationProp, RouteProp, useNavigation } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { FlatList, Platform, ScrollView, Text, View } from "react-native";
+import { FlatList, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { ListStackParamList } from "../navigation/ListStackNavigator";
 import { BrowseStackParamList } from "../navigation/BrowseStackNavigator";
-import { KhelProps, KhelListProps, useResponsiveStyles } from "../utils";
+import { KhelProps, KhelListProps, useResponsiveStyles, shareKhelMsg } from "../utils";
 import { isEqual } from "lodash";
 import { CategoryBadge, Type } from "../components";
 import { Button } from "@rneui/base";
 import { ThemeContext, ThemeInterface } from "../theme";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 type InfoScreenProps = {
   route: RouteProp<BrowseStackParamList | ListStackParamList, 'MoreInfo' | 'MoreInfo'>,
@@ -51,7 +51,7 @@ const base = (theme: ThemeInterface) => ({
     padding: theme.spacing.xxs,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: theme.spacing.xs,
+    gap: theme.spacing.sm,
   }
 });
 
@@ -60,7 +60,7 @@ const base = (theme: ThemeInterface) => ({
 export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
   
   const theme = useContext(ThemeContext);
-  const item = JSON.parse(route.params.item);
+  const { name, meaning, aim, description, category } = JSON.parse(route.params.item);
 
   const styles = useResponsiveStyles({ base });
 
@@ -68,6 +68,20 @@ export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
     styles.button,
     Platform.OS === 'ios' && styles.button_ios, 
   ];
+
+  useEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md}/>
+          </Pressable>
+        ),
+      });
+    }, []);
+
+  const share = useCallback(() => {
+    shareKhelMsg({ name, meaning, aim, description, category });
+  }, [])
 
   const containerStyles = [styles.container];
   const khelContainerStyles = [styles.khel_container];
@@ -78,20 +92,20 @@ export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
   return ( 
     <ScrollView contentContainerStyle={containerStyles} contentInsetAdjustmentBehavior="automatic">
       <View style={khelContainerStyles}>
-        <CategoryBadge category={item.category}/>
+        <CategoryBadge category={category}/>
         <Type weight='bold' color='title' size="sm">Meaning:</Type>
-        <Type size="sm" weight="medium">{item.meaning}</Type>
+        <Type size="sm" weight="medium">{meaning}</Type>
         <Type weight='bold' color='title' size="sm">Aim:</Type>
-        <Type size="sm" weight="medium">{item.aim}</Type>
+        <Type size="sm" weight="medium">{aim}</Type>
         <Type weight='bold' color='title'size="sm">Description:</Type>
-        <Type size="sm" weight="regular">{item.description}</Type>
+        <Type size="sm" weight="regular">{description}</Type>
       </View>
       <View style={buttonGroupStyles}>
         <Button buttonStyle={buttonStyles}>
           <View style={buttonContainerStyles}>
             <Ionicons 
               name='add'
-              size={theme.icon.lg}
+              size={theme.icon.sm}
               color={theme.colors.title}
             />
             <Type color="title" weight="bold" size='sm'>
@@ -100,11 +114,11 @@ export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
           </View>
         </Button>
 
-        <Button buttonStyle={buttonStyles}>
+        <Button buttonStyle={buttonStyles} onPress={share}>
           <View style={buttonContainerStyles}>
             <Ionicons 
               name='share-outline'
-              size={theme.icon.md}
+              size={theme.icon.sm}
               color={theme.colors.title}
             />
             <Type color="title" weight="bold" size='sm'>
@@ -117,7 +131,7 @@ export const MoreInfo = ({ navigation, route }: InfoScreenProps) => {
           <View style={buttonContainerStyles}>
             <Ionicons 
               name='mail-open-outline'
-              size={theme.icon.md}
+              size={theme.icon.sm}
               color={theme.colors.title}
             />
             <Type color="title" weight="bold" size='sm'>

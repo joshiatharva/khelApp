@@ -82,25 +82,6 @@ export const ListMoreInfo = ({
   const [listName, setListName] = useState<string>(list.name);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <Pressable
-          onPress={() => setDialogVisible(true)}
-        >
-          <Ionicons name={'create-outline'} size={theme.icon.lg} color={theme.colors.blue} />
-        </Pressable>
-      ),
-      headerRight: () => (
-        <Pressable onPress={goBack}>
-          <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.lg}/>
-        </Pressable>
-      ),
-      title: listName,
-    });
-  }, [listName]);
-  
-
   const styles = useResponsiveStyles({ base });
 
   const removeOnPress = (index: number) => {
@@ -118,9 +99,34 @@ export const ListMoreInfo = ({
   }
 
   const goBack = useCallback(() => {
-    updateListItem();
+    if (
+      // check list has been updated
+      listName !== list.name 
+      ||
+      JSON.stringify(khel.map(e => e.name)) !== JSON.stringify(list.khel.map((e: KhelProps) => e.name))
+    ) {
+      updateListItem();
+    }
     navigation.goBack();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Pressable
+          onPress={() => setDialogVisible(true)}
+        >
+          <Ionicons name={'create-outline'} color={theme.colors.blue} size={theme.icon.md} />
+        </Pressable>
+      ),
+      headerRight: () => (
+        <Pressable onPress={goBack}>
+          <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md}/>
+        </Pressable>
+      ),
+      title: listName,
+    });
+  }, [listName]);
 
   const deleteList = () => {
     // dispatch(delAll());
@@ -215,7 +221,7 @@ export const ListMoreInfo = ({
       <View style={buttonContainerStyles}>
         <Ionicons 
           name='share-outline'
-          size={theme.icon.md}
+          size={theme.icon.default}
           color={theme.colors.invertedTitle}
         />
         <Type color="inverted" weight='bold' size='sm'>
@@ -228,7 +234,7 @@ export const ListMoreInfo = ({
       <View style={buttonContainerStyles}>
         <Ionicons 
           name='trash'
-          size={theme.icon.md}
+          size={theme.icon.default}
           color={theme.colors.invertedTitle}
         />
         <Type color="inverted" weight='bold' size='sm'>

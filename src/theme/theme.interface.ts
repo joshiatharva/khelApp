@@ -42,6 +42,7 @@ export interface ThemeInterface {
       secondaryBackground: string;
       tertiaryBackground: string;
       altBackground: string;
+      invertedBackground: string;
     };
     fonts: {
       light: string;
@@ -76,6 +77,7 @@ export interface ThemeInterface {
       sm: number;
       md: number;
       lg: number;
+      xl: number;
     };
     button: {
       backgroundColor: string;

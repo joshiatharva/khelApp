@@ -52,11 +52,12 @@ export const baseTheme: Omit<ThemeInterface, 'colors' | 'colorsFixed' | 'dark'> 
     },
   },
   icon: {
-    default: 16,
+    default: 18,
     xs: 12,
-    sm: 14,
-    md: 18,
-    lg: 24,
+    sm: 24,
+    md: 30,
+    lg: 48,
+    xl: 64,
   },
   spacing: {
     xxs: 4,

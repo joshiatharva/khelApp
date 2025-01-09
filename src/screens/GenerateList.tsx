@@ -1,11 +1,11 @@
 import { Button, ButtonGroup, Divider, Input } from '@rneui/base';
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, ScrollView, Switch, View } from 'react-native';
 import { Type } from '../components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ThemeContext, ThemeInterface } from '../theme';
-import { KhelListProps, useResponsiveStyles, createList, pickKhelByCategory, _post, KhelCategory } from '../utils';
+import { KhelListProps, useResponsiveStyles, pickKhelByCategory, _post, KhelCategory, generateList } from '../utils';
 // import { RootState } from '../store';
 // import { useSelector, useDispatch } from 'react-redux';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -105,10 +105,22 @@ export const GenerateList = ({ navigation, route }: GenerateListScreenProps) => 
     setListName(name);
   }
 
-  const generateList = (): void => {
+  useEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md}/>
+          </Pressable>
+        ),
+      });
+    }, []);
+
+  const createListFromInput = async () => {
     const searchCategories = toggles.some(i => i === true) ? categories.filter((_, i: number) => toggles[i] === true) : categories;
-    _post(searchCategories, numOfKhel, listName).then(() => {
+    const newList = await generateList(searchCategories, numOfKhel, listName);
+    _post(newList).then(() => {
       navigation.pop();
+      navigation.push('ListMoreInfo', { item: JSON.stringify(newList), name: newList.name ? newList.name : 'Undefined' });
     })
   }
 
@@ -192,9 +204,9 @@ export const GenerateList = ({ navigation, route }: GenerateListScreenProps) => 
           </View>
         </View>
         <View>
-          <Button buttonStyle={buttonStyles} onPress={generateList}>
+          <Button buttonStyle={buttonStyles} onPress={createListFromInput}>
             <View style={buttonContainerStyles}>
-              <MaterialIcons name='add-box' size={theme.icon.default}/>
+              <MaterialIcons name='add-box' size={theme.icon.lg}/>
               <Type weight='bold' color='title' size='md'>Generate</Type>
             </View>
           </Button>

@@ -71,6 +71,7 @@ export const LightPalette: ThemeInterface['colors'] = {
   secondaryBackground: Colors.Neutral10,
   tertiaryBackground: Colors.Neutral30,
   altBackground: Colors.DeepWhite,
+  invertedBackground: Colors.White,
 }
 
 export const DarkPalette: ThemeInterface['colors'] = {
@@ -101,4 +102,5 @@ export const DarkPalette: ThemeInterface['colors'] = {
   secondaryBackground: Colors.Neutral11,
   tertiaryBackground: Colors.Neutral31,
   altBackground: Colors.Black,
+  invertedBackground: Colors.Neutral21,
 }

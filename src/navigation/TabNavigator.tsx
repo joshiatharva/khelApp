@@ -1,15 +1,51 @@
 
-import { BottomTabNavigationProp, BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useContext } from "react";
+import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigatorScreenParams } from "@react-navigation/native";
 import { ListStackParamList, ListStackNavigator as ListStack } from "./ListStackNavigator";
 import { BrowseStackParamList, BrowseStackNavigator as BrowseStack } from './BrowseStackNavigator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import About from '../screens/About';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { ThemeContext } from "../theme";
+import { Platform } from "react-native";
+
+export type AboutStackParamList = {
+  About: undefined;
+}
+
+export const AboutStack = createNativeStackNavigator<AboutStackParamList>();
+ 
+export const AboutStackNavigator = () => {
+  const theme = useContext(ThemeContext);
+  return (
+  <AboutStack.Navigator>
+    <AboutStack.Screen 
+      name="About"
+      component={About}
+      options={{ 
+        title: 'About',
+        headerLargeTitle: true, 
+        headerTransparent: true,
+        headerLargeStyle: {
+          backgroundColor: theme.colors.altBackground,
+        },
+        headerStyle: {
+          backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.1)' : theme.colors.background
+        },
+        headerBlurEffect: 'prominent',
+        headerShadowVisible: true,
+        headerLargeTitleShadowVisible: false,
+      }}
+    />
+    </AboutStack.Navigator>
+  );
+}
 
 export type BottomTabParamList = {
   Browse: NavigatorScreenParams<BrowseStackParamList>;
   List: NavigatorScreenParams<ListStackParamList>;
-  About: undefined;
+  AboutScreen: NavigatorScreenParams<AboutStackParamList>;
 };
 
 export type TabNavigationProps = BottomTabScreenProps<BottomTabParamList>;
@@ -52,9 +88,10 @@ export const BottomTabNavigator = () => {
         }}
       />
       <BottomTab.Screen 
-        name="About" 
-        component={About}
+        name="AboutScreen" 
+        component={AboutStackNavigator}
         options={{
+          title: "About",
           tabBarIcon: (
             ({ focused, color, size }) => 
             <Ionicons
@@ -62,7 +99,8 @@ export const BottomTabNavigator = () => {
               color={color}
               size={size}
             />
-          )
+          ),
+          headerShown: false
         }}
       />
     </BottomTab.Navigator>

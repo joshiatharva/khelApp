@@ -2,24 +2,61 @@ import { SELECT, DELETE, INSERT } from "../store";
 import { KhelProps, KhelListProps } from ".";
 import khel from '../../assets/khel.json';
 import { sampleSize, isString } from "lodash";
+import Share from 'react-native-share';
 // import { useDispatch, useSelector } from "react-redux";
 // import { add, del, delAll, upd } from "../features/listSlice";
 /**
  * 
  */
 
-export const shareList = ({
+export const shareListMsg = async ({
     name,
-    categories,
-    id,
     khel,
-}: KhelListProps): string => {
-  const msg = `${name}\n`;
-  const khels = Array.from(khel.entries())
-    .reduce((acc, cur) => acc + `${cur[0]}.) ${cur[1]['name']} (${cur[1]['category']})\n` , msg);
-  return msg;
+}: { name: string, khel: KhelProps[] }) => {
+  const title = name;
+  const message = Array.from(khel.entries())
+    .reduce((acc, cur) => acc + `${cur[0] + 1}.) ${cur[1]['name']} (${cur[1]['category']})\n` , `${name}\n`);
+  console.log(message);
+  const options = {
+    title,
+    message,
+  };
+  try {
+    await Share.open(options);
+  } catch (err: any) {
+    alert(err);
+  }
 };
 
+export const shareKhelMsg = async ({
+ name,
+ meaning, 
+ aim,
+ description,
+ category
+}: KhelProps) => {
+  const msg = `${name} - ${category}
+  \n
+  Meaning:
+  ${meaning}
+  \n
+  Aim:
+  ${aim}
+  \n
+  Description:
+  ${description}
+  \n`;
+  const title = name;
+  const options = {
+    message: msg,
+    title,
+  };
+  try {
+    await Share.open(options);
+  } catch (err: any) {
+    alert(err);
+  }
+}
 /**
  * 
  */
@@ -30,7 +67,7 @@ export const addToList = (k: KhelProps, l?: KhelListProps, fn: string | number =
     listOfKhels.push(k);
     return l;
   }
-  return createList(fn, k);
+  return createListObj(fn, k);
 };
 
 /**
@@ -44,7 +81,7 @@ export const getListIndexes = async () => {
   return indexes.map(({ name }: { name: string }) => Number.parseInt(name.replace('List ', ''))).sort().pop();
 }
 
-export const createList = (lN: string | number, k: KhelProps | Array<KhelProps>) => {
+export const createListObj = (lN: string | number, k: KhelProps | Array<KhelProps>): KhelListProps => {
   const newList: KhelListProps = {
     name: isString(lN) ? lN : generateName(lN),
     id: '',
@@ -75,6 +112,17 @@ export const generateId = (lN: string) => {
   }
   return String(hash);
 };
+
+export const generateList = async (arr: string[], len: number, name: string) => {
+  const data = (await SELECT()).result;
+  const khel =  pickKhelByCategory(len, arr);
+  if (name.length <= 0) {
+    const listNames = data.filter((list: KhelListProps) => list.name.startsWith('List'));
+    const finalListIndex = listNames.map((i: KhelListProps) => i.name.replace('List ', '')).sort()[listNames.length-1];
+    return createListObj((Boolean(finalListIndex) ? (Number(finalListIndex) + 1) : 1), khel);
+  }
+  return createListObj(name, khel);
+}
 /**
  * 
  * example: { categories: [],
@@ -89,21 +137,12 @@ export const _get = async () => {
   return res;
 };
 
-export const _post = async (arr: string[], len: number, name: string) => {
+export const _post = async (list: KhelListProps) => {
   // const data = useSelector((state: RootState) => state.lists);
   // const dispatch = useDispatch();
   const data = (await SELECT()).result;
-  const khel =  pickKhelByCategory(len, arr);
-  let newList;
-  if (name.length <= 0) {
-    const listNames = data.filter((list: KhelListProps) => list.name.startsWith('List'));
-    const finalListIndex = listNames.map((i: KhelListProps) => i.name.replace('List ', '')).sort()[listNames.length-1];
-    newList = createList((Boolean(finalListIndex) ? (Number(finalListIndex) + 1) : 1), khel);
-  } else {
-    newList = createList(name, khel);
-  }
   // dispatch(add(newList));
-  data.push(newList);
+  data.push(list);
   const result = await INSERT(data);
   return result;
 };
@@ -128,7 +167,7 @@ export const _put = async (khel?: KhelProps, list?: KhelListProps) => {
 
   } else if (khel) {
     const ind = await getListIndexes();
-    newList = createList(ind, khel);
+    newList = createListObj(ind, khel);
   }
   const newData = data.map((item: KhelListProps) => item.id === newList.id ? newList : item);
   const result = await INSERT(newData);

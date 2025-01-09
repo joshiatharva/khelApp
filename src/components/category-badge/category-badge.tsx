@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Platform, View } from "react-native";
+import { Platform, View, ViewProps } from "react-native";
 import { ThemeInterface } from '../../theme';
 import { KhelCategory, useResponsiveStyles } from '../../utils';
 import { Type } from '../typography';
@@ -39,11 +39,11 @@ const base = (theme: ThemeInterface) => ({
   },
 });
 
-type CategoryProps = {
+interface CategoryProps extends Omit<ViewProps, 'style'> {
   category: string;
 }
 
-export const CategoryBadge = ({ category }: CategoryProps) => {
+export const CategoryBadge = ({ category, ...props }: CategoryProps) => {
   const styles = useResponsiveStyles({ base });
   const badgeStyles = [
     styles.container,
@@ -58,8 +58,8 @@ export const CategoryBadge = ({ category }: CategoryProps) => {
   ];
   const textStyles = [styles.text];
   return (
-    <View style={badgeStyles}>
-      <Type style={textStyles} size='xs' weight='bold' color='category'>{category}</Type>
+    <View style={badgeStyles} {...props}>
+      <Type style={textStyles} key={category} size='xs' weight='bold' color='category'>{category}</Type>
     </View>
   )
 };

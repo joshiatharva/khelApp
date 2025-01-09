@@ -9,7 +9,6 @@ interface ListState {
 
 const initialState: ListState = {
     lists: [],
-    
 }
 
 /**

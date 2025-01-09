@@ -10,7 +10,7 @@ import ListMoreInfo from '../screens/ListMoreInfo';
 
 
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 import { useContext } from "react";
 import { ThemeContext } from "../theme";
 import { KhelProps, KhelListProps } from "../utils";
@@ -23,50 +23,88 @@ export type ListStackParamList = {
   MoreInfo: { item: string, name: string };
 };
 
-const theme = useContext(ThemeContext)
-
 export const ListStack = createNativeStackNavigator<ListStackParamList>();
 
-export const ListStackNavigator = () => (
-  <ListStack.Navigator>
-    <ListStack.Group>
-      <ListStack.Screen 
-        name="Lists" 
-        component={Lists} 
-        options={{ title: 'My lists' }}
-      />
-     </ListStack.Group>
-    <ListStack.Group screenOptions={{ presentation: 'modal' }}>
-      <ListStack.Screen 
-        name="GenerateList" 
-        component={GenerateList} 
-        options={{ title: 'Generate lists', headerLargeTitle: true }}
-      />
 
-      <ListStack.Screen 
-        name="MoreInfo" 
-        component={MoreInfo} 
-        options={({ route, navigation }) => ({
-          title: route.params.name,
-          headerLargeTitle: true,
-          headerRight: () => (
-            <Pressable onPress={() => navigation.goBack()}>
-              <Ionicons name="close-circle-outline" color={theme.colors.blue} size={theme.icon.md} />
-            </Pressable>
-          ),
-        })}
-      />
-    <ListStack.Screen 
-        name="ListMoreInfo" 
-        component={ListMoreInfo} 
-        options={({ route, navigation }) => ({
-          title: route.params.name,
-          headerLargeTitle: true,
-          headerTransparent: true, 
+export const ListStackNavigator = () => {
+  const theme = useContext(ThemeContext);
+  return (
+    <ListStack.Navigator>
+      <ListStack.Group>
+        <ListStack.Screen 
+          name="Lists" 
+          component={Lists} 
+          options={{ 
+            title: 'My lists',
+            headerLargeTitle: true, 
+            headerTransparent: true,
+            headerLargeStyle: {
+              backgroundColor: theme.colors.altBackground,
+            },
+            headerBlurEffect: 'prominent',
+            headerShadowVisible: true,
+          }}
+        />
+       </ListStack.Group>
+      <ListStack.Group screenOptions={{ presentation: 'modal' }}>
+        <ListStack.Screen 
+          name="GenerateList" 
+          component={GenerateList} 
+          options={({ }) => ({ 
+            title: 'Generate lists', 
+            headerLargeTitle: true,
+            headerTransparent: true,
+            headerLargeStyle: {
+              backgroundColor: theme.colors.altBackground,
+            },
+            headerStyle: {
+              backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.1)' : theme.colors.background
+            },
+            headerBlurEffect: 'prominent',
+            headerShadowVisible: true,
+            headerLargeTitleShadowVisible: false,
+          })}
+        />
+  
+        <ListStack.Screen 
+          name="MoreInfo" 
+          component={MoreInfo} 
+          options={({ route }) => ({
+            title: route.params.name,
+            headerLargeTitle: true,
+            headerTransparent: true,
+            headerLargeStyle: {
+              backgroundColor: theme.colors.altBackground,
+            },
+            headerStyle: {
+              backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.1)' : theme.colors.background
+            },
+            headerBlurEffect: 'prominent',
+            headerShadowVisible: true,
+            headerLargeTitleShadowVisible: false,
         })}
         />
-      </ListStack.Group>
-  </ListStack.Navigator>
-);
+      <ListStack.Screen 
+          name="ListMoreInfo" 
+          component={ListMoreInfo} 
+          options={({ route }) => ({
+            title: route.params.name,
+            headerLargeTitle: true,
+            headerTransparent: true,
+            headerLargeStyle: {
+              backgroundColor: theme.colors.altBackground,
+            },
+            headerStyle: {
+              backgroundColor: Platform.OS === 'ios' ? 'rgba(255,255,255,0.1)' : theme.colors.background
+            },
+            headerBlurEffect: 'prominent',
+            headerShadowVisible: true,
+            headerLargeTitleShadowVisible: false,
+          })}
+          />
+        </ListStack.Group>
+    </ListStack.Navigator>
+  );
+}
 
 export default ListStackNavigator; 
